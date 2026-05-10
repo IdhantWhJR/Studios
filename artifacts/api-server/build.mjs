@@ -1,0 +1,33 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { build as esbuild } from "esbuild";
+import { rm } from "node:fs/promises";
+
+const artifactDir = path.dirname(fileURLToPath(import.meta.url));
+
+async function buildAll() {
+  const distDir = path.resolve(artifactDir, "dist");
+  await rm(distDir, { recursive: true, force: true });
+
+  await esbuild({
+    entryPoints: [path.resolve(artifactDir, "src/index.ts")],
+    platform: "node",
+    bundle: true,
+    format: "esm",
+    outdir: distDir,
+    outExtension: { ".js": ".mjs" },
+    logLevel: "info",
+    // Externalize all packages from node_modules (both npm and workspace).
+    // Workspace packages (@workspace/*) are pre-compiled to JS via their own
+    // build scripts, so Node.js can resolve them at runtime without TypeScript.
+    packages: "external",
+    // Still externalize native addons that can never be bundled.
+    external: ["*.node"],
+    sourcemap: "linked",
+  });
+}
+
+buildAll().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
