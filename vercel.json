@@ -1,5 +1,6 @@
 {
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter @workspace/api-zod run build && pnpm --filter @workspace/db run build && pnpm --filter @workspace/api-server run build",
+  "buildCommand": "pnpm --filter @workspace/echelon-studios run build",
+  "outputDirectory": "artifacts/echelon-studios/dist",
   "framework": null
 }
